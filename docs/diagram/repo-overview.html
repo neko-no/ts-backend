@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>学習ノートの複数AIレビュー · Swimlane</title>
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500;600&family=Noto+Serif:ital@0;1&family=Noto+Sans+KR:wght@400;500;600&family=Noto+Serif+KR:wght@400&family=Noto+Sans+TC:wght@400;500;600&family=Noto+Serif+TC:wght@400&family=Noto+Sans+JP:wght@400;500;600&family=Noto+Serif+JP:wght@400&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --color-paper:   #f5f5f5;   /* white-smoke */
+      --color-ink:     #2d3142;   /* jet-black */
+      --color-muted:   #4f5d75;   /* blue-slate */
+      --color-accent:  #bf4520;   /* burnt-tangerine */
+      --font-sans:     'Geist', 'Noto Sans JP', 'Hiragino Sans', 'Yu Gothic', system-ui, sans-serif;
+      --font-serif:    'Instrument Serif', 'Noto Serif', 'Noto Serif JP', 'Hiragino Mincho ProN', serif;
+      --font-mono:     'Geist Mono', ui-monospace, monospace;
+    }
+
+    body {
+      font-family: var(--font-sans);
+      background: var(--color-paper);
+      color: var(--color-ink);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 3rem 2rem;
+    }
+
+    .frame { max-width: 1320px; width: 100%; }
+    /* The SVG holds its readable width (min-width == the viewBox width, so the
+       type ramp is never silently scaled down). This wrapper lets a narrow
+       screen scroll the diagram instead of the whole page. */
+    .diagram-container { width: 100%; overflow-x: auto; }
+
+    .eyebrow {
+      font-family: var(--font-mono);
+      font-size: 0.66rem;
+      font-weight: 500;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--color-muted);
+      margin-bottom: 0.5rem;
+    }
+
+    h1 {
+      font-family: var(--font-serif);
+      font-size: clamp(1.5rem, 2.4vw + 0.75rem, 2rem);
+      font-weight: 400;
+      letter-spacing: -0.02em;
+      line-height: 1.15;
+      color: var(--color-ink);
+      margin-bottom: 1.5rem;
+    }
+
+    svg { width: 100%; min-width: 1280px; display: block; }
+    /* Paper has no scrollbar, so the local scroller would clip instead of
+       scroll. Let the diagram scale down to the sheet: smaller but whole
+       beats sharp but cut off. Must come after the svg rule above - a media
+       query adds no specificity, so a later plain rule would win. */
+    @media print {
+      .diagram-container { overflow-x: visible; }
+      svg { min-width: 0; }
+    }
+  </style>
+</head>
+<body>
+  <div class="frame">
+    <p class="eyebrow">Swimlane · Diagram Design</p>
+    <h1>学習ノートの複数AIレビュー</h1>
+
+    <div class="diagram-container">
+      <svg viewBox="0 0 1280 556" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="repo-overview-title repo-overview-desc">
+        <title id="repo-overview-title">学習ノートの複数AIレビュー</title>
+        <desc id="repo-overview-desc">書籍と参照元を読んで人間がノートとコードを書き、Claude Code が Codex と agy を並列に動かして検証・統合したレポートを、人間が判断して修正し、再びレビューに回すサイクルを示す。</desc>
+        <defs>
+          <marker id="arrow" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#4f5d75"/></marker>
+          <marker id="arrow-accent" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#bf4520"/></marker>
+          <marker id="arrow-link" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#2e5aa8"/></marker>
+        </defs>
+
+        <rect width="100%" height="100%" fill="#f5f5f5"/>
+
+        <!-- Lane dividers -->
+        <line x1="40" y1="40" x2="1240" y2="40" stroke="rgba(45,49,66,0.22)" stroke-width="1"/>
+        <line x1="40" y1="184" x2="1240" y2="184" stroke="rgba(45,49,66,0.10)" stroke-width="1"/>
+        <line x1="40" y1="328" x2="1240" y2="328" stroke="rgba(45,49,66,0.10)" stroke-width="1"/>
+        <line x1="40" y1="472" x2="1240" y2="472" stroke="rgba(45,49,66,0.22)" stroke-width="1"/>
+
+        <!-- Actor column divider -->
+        <line x1="200" y1="40" x2="200" y2="472" stroke="rgba(45,49,66,0.22)" stroke-width="1"/>
+
+        <!-- Lane labels -->
+        <text x="60" y="110" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist', 'Noto Sans JP', 'Hiragino Sans', 'Yu Gothic', sans-serif">人間</text>
+        <text x="60" y="126" fill="#4f5d75" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" letter-spacing="0.18em">HUMAN</text>
+        <text x="60" y="254" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist', 'Noto Sans JP', 'Hiragino Sans', 'Yu Gothic', sans-serif">司令塔</text>
+        <text x="60" y="270" fill="#4f5d75" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" letter-spacing="0.18em">CLAUDE CODE</text>
+        <text x="60" y="398" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist', 'Noto Sans JP', 'Hiragino Sans', 'Yu Gothic', sans-serif">外部AI</text>
+        <text x="60" y="414" fill="#4f5d75" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" letter-spacing="0.18em">CODEX · AGY</text>
+
+        <!-- Arrows (drawn first) -->
+        <!-- a1. 書籍・参照元を読む → ノート執筆・コード実装 (within 人間) -->
+        <line x1="384" y1="112" x2="424" y2="112" stroke="#4f5d75" stroke-width="1.2" marker-end="url(#arrow)"/>
+        <!-- a2. ノート執筆・コード実装 → 一次レビュー (人間 → 司令塔 handoff, straight down) -->
+        <line x1="504" y1="144" x2="504" y2="224" stroke="#4f5d75" stroke-width="1.2" marker-end="url(#arrow)"/>
+        <!-- a3. 一次レビュー → 外部AI (司令塔 → 外部AI, elbow) -->
+        <path d="M 504,288 V 392 Q 504,400 512,400 H 624" fill="none" stroke="#4f5d75" stroke-width="1.2" marker-end="url(#arrow)"/>
+        <!-- a4. 外部AI → 監査と根拠の検証 (外部AI → 司令塔, elbow up) -->
+        <path d="M 784,400 H 896 Q 904,400 904,392 V 288" fill="none" stroke="#4f5d75" stroke-width="1.2" marker-end="url(#arrow)"/>
+        <!-- a5. 監査と根拠の検証 → 匿名化して統合 (within 司令塔) -->
+        <line x1="984" y1="256" x2="1024" y2="256" stroke="#4f5d75" stroke-width="1.2" marker-end="url(#arrow)"/>
+        <!-- a6. 匿名化して統合 → 判断して手で修正 (司令塔 → 人間 handoff, straight up) -->
+        <line x1="1104" y1="224" x2="1104" y2="144" stroke="#4f5d75" stroke-width="1.2" marker-end="url(#arrow)"/>
+        <!-- a7. 判断して手で修正 → ノート執筆・コード実装 (loop back, accent, dashed) -->
+        <line x1="1024" y1="112" x2="584" y2="112" stroke="#bf4520" stroke-width="1.4" stroke-dasharray="5,4" marker-end="url(#arrow-accent)"/>
+
+        <!-- Arrow labels (masked, 6-10px off the stroke) -->
+        <rect x="512" y="176" width="84" height="16" rx="2" fill="#f5f5f5"/>
+        <text x="554" y="188" fill="#4f5d75" font-size="12" font-weight="500" font-family="'Geist', 'Noto Sans JP', 'Hiragino Sans', 'Yu Gothic', sans-serif" text-anchor="middle">レビュー依頼</text>
+
+        <rect x="538" y="378" width="60" height="16" rx="2" fill="#f5f5f5"/>
+        <text x="568" y="390" fill="#4f5d75" font-size="12" font-weight="500" font-family="'Geist', 'Noto Sans JP', 'Hiragino Sans', 'Yu Gothic', sans-serif" text-anchor="middle">並列起動</text>
+
+        <rect x="798" y="378" width="84" height="16" rx="2" fill="#f5f5f5"/>
+        <text x="840" y="390" fill="#4f5d75" font-size="12" font-weight="500" font-family="'Geist', 'Noto Sans JP', 'Hiragino Sans', 'Yu Gothic', sans-serif" text-anchor="middle">生出力を保存</text>
+
+        <rect x="1112" y="176" width="60" height="16" rx="2" fill="#f5f5f5"/>
+        <text x="1142" y="188" fill="#4f5d75" font-size="12" font-weight="500" font-family="'Geist', 'Noto Sans JP', 'Hiragino Sans', 'Yu Gothic', sans-serif" text-anchor="middle">レポート</text>
+
+        <rect x="744" y="88" width="120" height="16" rx="2" fill="#f5f5f5"/>
+        <text x="804" y="100" fill="#bf4520" font-size="12" font-weight="500" font-family="'Geist', 'Noto Sans JP', 'Hiragino Sans', 'Yu Gothic', sans-serif" text-anchor="middle">修正して再レビュー</text>
+
+        <!-- Nodes -->
+        <!-- 人間: 書籍・参照元を読む (input) -->
+        <rect x="224" y="80" width="160" height="64" rx="6" fill="#f5f5f5"/>
+        <rect x="224" y="80" width="160" height="64" rx="6" fill="rgba(79,93,117,0.10)" stroke="#5a6580" stroke-width="1"/>
+        <text x="304" y="108" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist', 'Noto Sans JP', 'Hiragino Sans', 'Yu Gothic', sans-serif" text-anchor="middle">書籍・参照元を読む</text>
+        <text x="304" y="126" fill="#4f5d75" font-size="9" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle">book-v1.0.0</text>
+
+        <!-- 人間: ノート執筆・コード実装 (step) -->
+        <rect x="424" y="80" width="160" height="64" rx="6" fill="#f5f5f5"/>
+        <rect x="424" y="80" width="160" height="64" rx="6" fill="#ffffff" stroke="#2d3142" stroke-width="1"/>
+        <text x="504" y="108" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist', 'Noto Sans JP', 'Hiragino Sans', 'Yu Gothic', sans-serif" text-anchor="middle">ノート執筆・コード実装</text>
+        <text x="504" y="126" fill="#4f5d75" font-size="9" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle">notes/ · code/</text>
+
+        <!-- 人間: 判断して手で修正 (focal) -->
+        <rect x="1024" y="80" width="160" height="64" rx="6" fill="#f5f5f5"/>
+        <rect x="1024" y="80" width="160" height="64" rx="6" fill="rgba(191,69,32,0.08)" stroke="#bf4520" stroke-width="1"/>
+        <text x="1104" y="108" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist', 'Noto Sans JP', 'Hiragino Sans', 'Yu Gothic', sans-serif" text-anchor="middle">判断して手で修正</text>
+        <text x="1104" y="126" fill="#4f5d75" font-size="9" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle">ledger/findings.jsonl</text>
+
+        <!-- 司令塔: 一次レビューを先行保存 (step) -->
+        <rect x="424" y="224" width="160" height="64" rx="6" fill="#f5f5f5"/>
+        <rect x="424" y="224" width="160" height="64" rx="6" fill="#ffffff" stroke="#2d3142" stroke-width="1"/>
+        <text x="504" y="252" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist', 'Noto Sans JP', 'Hiragino Sans', 'Yu Gothic', sans-serif" text-anchor="middle">一次レビューを先行保存</text>
+        <text x="504" y="270" fill="#4f5d75" font-size="9" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle">raw/claude_raw.md</text>
+
+        <!-- 司令塔: 監査と根拠の検証 (step) -->
+        <rect x="824" y="224" width="160" height="64" rx="6" fill="#f5f5f5"/>
+        <rect x="824" y="224" width="160" height="64" rx="6" fill="#ffffff" stroke="#2d3142" stroke-width="1"/>
+        <text x="904" y="252" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist', 'Noto Sans JP', 'Hiragino Sans', 'Yu Gothic', sans-serif" text-anchor="middle">監査と根拠の検証</text>
+        <text x="904" y="270" fill="#4f5d75" font-size="9" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle">diff · Grep/Read · tsc</text>
+
+        <!-- 司令塔: 匿名化して統合 (step) -->
+        <rect x="1024" y="224" width="160" height="64" rx="6" fill="#f5f5f5"/>
+        <rect x="1024" y="224" width="160" height="64" rx="6" fill="#ffffff" stroke="#2d3142" stroke-width="1"/>
+        <text x="1104" y="252" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist', 'Noto Sans JP', 'Hiragino Sans', 'Yu Gothic', sans-serif" text-anchor="middle">匿名化して統合</text>
+        <text x="1104" y="270" fill="#4f5d75" font-size="9" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle">reviews/summary/</text>
+
+        <!-- 外部AI: 並列レビュー (external) -->
+        <rect x="624" y="368" width="160" height="64" rx="6" fill="#f5f5f5"/>
+        <rect x="624" y="368" width="160" height="64" rx="6" fill="rgba(45,49,66,0.03)" stroke="rgba(45,49,66,0.30)" stroke-width="1"/>
+        <text x="704" y="396" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist', 'Noto Sans JP', 'Hiragino Sans', 'Yu Gothic', sans-serif" text-anchor="middle">外部AIが並列レビュー</text>
+        <text x="704" y="414" fill="#4f5d75" font-size="9" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle">codex exec · agy -p</text>
+
+        <!-- Legend -->
+        <line x1="40" y1="496" x2="1240" y2="496" stroke="rgba(45,49,66,0.10)" stroke-width="0.8"/>
+        <text x="40" y="512" fill="#4f5d75" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" letter-spacing="0.18em">LEGEND</text>
+
+        <rect x="40" y="528" width="14" height="10" rx="2" fill="rgba(79,93,117,0.10)" stroke="#5a6580" stroke-width="1"/>
+        <text x="60" y="538" fill="#4f5d75" font-size="12" font-family="'Geist', 'Noto Sans JP', 'Hiragino Sans', 'Yu Gothic', sans-serif">入力・一次情報</text>
+
+        <rect x="176" y="528" width="14" height="10" rx="2" fill="#ffffff" stroke="#2d3142" stroke-width="1"/>
+        <text x="196" y="538" fill="#4f5d75" font-size="12" font-family="'Geist', 'Noto Sans JP', 'Hiragino Sans', 'Yu Gothic', sans-serif">ステップ</text>
+
+        <rect x="276" y="528" width="14" height="10" rx="2" fill="rgba(45,49,66,0.03)" stroke="rgba(45,49,66,0.30)" stroke-width="1"/>
+        <text x="296" y="538" fill="#4f5d75" font-size="12" font-family="'Geist', 'Noto Sans JP', 'Hiragino Sans', 'Yu Gothic', sans-serif">外部AI（読み取り専用）</text>
+
+        <rect x="468" y="528" width="14" height="10" rx="2" fill="rgba(191,69,32,0.08)" stroke="#bf4520" stroke-width="1"/>
+        <text x="488" y="538" fill="#4f5d75" font-size="12" font-family="'Geist', 'Noto Sans JP', 'Hiragino Sans', 'Yu Gothic', sans-serif">人間の最終判断</text>
+
+        <line x1="604" y1="533" x2="632" y2="533" stroke="#4f5d75" stroke-width="1.2" marker-end="url(#arrow)"/>
+        <text x="640" y="538" fill="#4f5d75" font-size="12" font-family="'Geist', 'Noto Sans JP', 'Hiragino Sans', 'Yu Gothic', sans-serif">処理の流れ</text>
+
+        <line x1="728" y1="533" x2="756" y2="533" stroke="#bf4520" stroke-width="1.4" stroke-dasharray="5,4" marker-end="url(#arrow-accent)"/>
+        <text x="764" y="538" fill="#4f5d75" font-size="12" font-family="'Geist', 'Noto Sans JP', 'Hiragino Sans', 'Yu Gothic', sans-serif">修正して再レビュー</text>
+      </svg>
+    </div>
+  </div>
+</body>
+</html>
