@@ -23,7 +23,7 @@ disable-model-invocation: true
 | 1 | 文脈特定 | 対応コードは**ノート冒頭の記載**に従う。記載が無ければ推測せず「対応不明」と報告する。`chXX` は `notes/` 配下のファイルのベース名（拡張子なし）とする |
 | 2 | Claude一次レビューの先行保存 | **他AIの出力を読む前に** `reviews/raw/<run_id>/claude_raw.md` へ保存する。`run_id` と `mkdir` の手順は `CLAUDE.md` §2 Step 2 |
 | 3 | 外部CLIの並列実行 | `CLAUDE.md` §2 Step 3 のスクリプトを、1回のBash呼び出しで実行する |
-| 4 | 安全監査 | 終了コード、非空、agy の `status`、実行前後スナップショットの `diff`。差分があれば統合を中止して報告する |
+| 4 | 安全監査 | 終了コード、非空、agy の `status` / `response` 非空 / `denied_actions` 空、実行前後スナップショットの `diff`。差分があれば統合を中止して報告する |
 | 5 | 検証と証拠スコアリング | 行番号・コード断片の実在を `Read` / `Grep` で確認する。採点基準は未設定。点数を創作せず、「検証済み / 未検証 / 虚偽参照」の区分で記録する |
 | 6 | 統合レポート | `reviews/summary/<chXX>_<run_id>.md` に、レビュアー名を匿名化（Reviewer A / B / C）して出力する |
 

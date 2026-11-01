@@ -42,6 +42,7 @@ mkdir "reviews/raw/$RUN_ID"
 
 - 子エージェントには AGENTS.md の保存先規定（`reviews/raw/` への書き出し）が見えるが、保存は司令塔（Claude）がリダイレクトで行う。そのため、プロンプトで「標準出力のみに出力し、ファイルは作らない」と明示する。
 - Codex の出力はテキスト（Markdown）なので `.md`、agy の出力は JSON なので `.json` で保存する（`--json` は付けない）。
+- agy はヘッドレスで許可を確認できず、リポジトリ外のファイルの `read_file` を自動拒否する。書籍はリポジトリ外にあるため、`--add-dir "$BOOK"` で作業領域に追加する（`--dangerously-skip-permissions` は使わない）。Codex は `--sandbox read-only` のままリポジトリ外を読める。
 
 ```bash
 RAW="reviews/raw/$RUN_ID"
@@ -74,6 +75,7 @@ PID_CODEX=$!
 export AGY_CLI_DISABLE_AUTO_UPDATE=true
 agy -p "$PROMPT" \
   --mode plan \
+  --add-dir "$BOOK" \
   --output-format json \
   --print-timeout 5m \
   < /dev/null > "$RAW/agy_raw.json" 2> "$RAW/agy.err" &
@@ -87,7 +89,15 @@ snapshot > "$RAW/audit_after.txt"
 ```
 
 ### Step 4: 安全監査（Failure Gate）
-- 終了コード（`codex.exit` / `agy.exit`）が 0 であり、出力ファイルが非空（> 0バイト）であることを確認。agy は、さらに `agy_raw.json` の `status` が `SUCCESS` であることも確認する。
+- 終了コード（`codex.exit` / `agy.exit`）が 0 であり、出力ファイルが非空（> 0バイト）であることを確認。
+- agy は、さらに `agy_raw.json` で次の3点をすべて確認する。`status` が `SUCCESS` でも、権限拒否で何も読めずに空の応答を返すことがあるため（`agy.err` に拒否の理由が出る）、`status` だけでは成功とみなさない。
+  1. `status` が `SUCCESS` である
+  2. `response` が空でない
+  3. `denied_actions` が存在しない、または空である
+
+  ```bash
+  python3 -I -c 'import json,sys; d=json.load(open(sys.argv[1])); sys.exit(0 if d["status"]=="SUCCESS" and d["response"].strip() and not d.get("denied_actions") else 1)' "$RAW/agy_raw.json"
+  ```
 - `diff "$RAW/audit_before.txt" "$RAW/audit_after.txt"` で、`notes/` や `code/` が実行前後で変化していないことを検証する（`git status` だけでは、未追跡ファイルや、すでに変更済みのファイルへの追加変更を検知できないため）。差分があれば、統合を中止して人間に報告する。
 - 失敗したレビュアーは、統合レポートに「失敗」と明記する（失敗時の詳細な扱いは、運用しながら更新する）。
 
