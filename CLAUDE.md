@@ -142,3 +142,4 @@ snapshot > "$RAW/audit_after.txt"
 - `notes/` や `code/` の直接修正。
 - `--dangerously-skip-permissions` や `--yolo` などの権限全開フラグの使用。
 - 一次情報（書籍・公式ドキュメント・実行結果）の根拠がない曖昧な指摘の正解扱い。
+- `reviews/raw/` のコミット（CLI のログに書籍の本文が含まれうる。リポジトリは公開）。統合レポート（`reviews/summary/`）にも、書籍の本文を引用しない。

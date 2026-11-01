@@ -13,7 +13,7 @@ my-backend-ts-handson/
 ├── notes/                   # 人間が執筆する学習ノート（Markdown）
 ├── code/                    # 人間が実装・検証するハンズオンコード（TypeScript / Vitest）
 ├── reviews/                 # AIレビュー関連成果物
-│   ├── raw/                 # 各AIの無加工生出力（自動保存・編集禁止）
+│   ├── raw/                 # 各AIの無加工生出力（自動保存・編集禁止。ローカルのみで、コミットしない）
 │   ├── summary/             # Claudeが匿名化・検証のうえ統合した最終レポート
 │   └── ledger/              # 人間による正誤判定台帳
 │       └── findings.jsonl
@@ -23,7 +23,7 @@ my-backend-ts-handson/
 
 ### 【絶対順守ルール】
 1. **読み取り専用原則**: レビュー時、エージェントは `notes/` および `code/` 配下のファイルを直接書き換えてはならない。
-2. **成果物の保存先**: レビュー出力は指定された `reviews/raw/` および `reviews/summary/` 配下のみに書き出すこと。
+2. **成果物の保存先**: レビュー出力は指定された `reviews/raw/` および `reviews/summary/` 配下のみに書き出すこと。`reviews/raw/` は、CLI のログに書籍の本文が含まれうる（リポジトリは公開）ため、`.gitignore` で管理外とし、コミットしない。コミットするのは `reviews/summary/` と `reviews/ledger/` のみ。
 3. **人間による修正**: ノートやコードの修正は、統合レポート（`reviews/summary/`）と一次情報（書籍・公式ドキュメント・`tsc`型チェック）を確認のうえ、人間が手動で行う。
 
 ---
