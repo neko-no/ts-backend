@@ -22,7 +22,7 @@
 ユーザーから `/multi-note-review notes/chXX.md` と指示された場合、以下の手順を実行する。
 
 ### Step 1: 文脈特定
-対象の学習ノート（`notes/chXX.md`）と対応コード（`code/chXX/`）を特定する。
+対象の学習ノート（`notes/chXX.md`）と、そのノート冒頭に記載された対応コードを特定する（`code/` は章ごとに分けない）。記載がなければ推測せず「対応不明」と報告する。
 
 ### Step 2: Claude一次レビューの先行保存
 他AIの出力を見る前に、Claude単体でのレビューを `reviews/raw/<run_id>/claude_raw.md` に保存する。
@@ -53,9 +53,14 @@ snapshot() {
 }
 snapshot > "$RAW/audit_before.txt"
 
+# 書籍の絶対パス（司令塔がメモリ `book-local-location` から補う。リポジトリ外にある）
+BOOK="<書籍の絶対パス>"
+
 PROMPT="$(cat AGENTS.md)
 
-対象: notes/chXX.md, code/chXX/
+対象: notes/chXX.md と、そのノート冒頭に記載された対応コード（code/ 配下）
+書籍の場所: $BOOK
+（章ごとの抽出テキストは $BOOK/text/chNN.txt。読めなければ『読めない』と報告し、推測で補わないこと）
 指示: 上記の規約に従って対象をレビューし、結果を標準出力のみに出力すること。ファイルの作成・変更は一切行わないこと（保存は呼び出し側が行う）。"
 
 # Codex CLI
