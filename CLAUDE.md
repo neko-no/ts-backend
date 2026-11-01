@@ -42,7 +42,7 @@ mkdir "reviews/raw/$RUN_ID"
 
 - 子エージェントには AGENTS.md の保存先規定（`reviews/raw/` への書き出し）が見えるが、保存は司令塔（Claude）がリダイレクトで行う。そのため、プロンプトで「標準出力のみに出力し、ファイルは作らない」と明示する。
 - Codex の出力はテキスト（Markdown）なので `.md`、agy の出力は JSON なので `.json` で保存する（`--json` は付けない）。
-- agy はヘッドレスで許可を確認できず、リポジトリ外のファイルの `read_file` を自動拒否する。書籍はリポジトリ外にあるため、`--add-dir "$BOOK"` で作業領域に追加する（`--dangerously-skip-permissions` は使わない）。Codex は `--sandbox read-only` のままリポジトリ外を読める。
+- agy はヘッドレスで許可を確認できず、リポジトリ外のファイルの `read_file` を自動拒否し、コマンド実行（`curl` など）も拒否するため Web を取得できない。書籍と外部資料はリポジトリ外にあるため、`--add-dir` で作業領域に追加する（`--dangerously-skip-permissions` は使わない）。Codex は `--sandbox read-only` のままリポジトリ外を読めるが、Web 検索も使えてしまう。3者を同じ条件にするため、プロンプトで「Web は使わず、渡したローカルのファイルだけを読む」と指示する。
 
 ```bash
 RAW="reviews/raw/$RUN_ID"
@@ -56,12 +56,18 @@ snapshot > "$RAW/audit_before.txt"
 
 # 書籍の絶対パス（司令塔がメモリ `book-local-location` から補う。リポジトリ外にある）
 BOOK="<書籍の絶対パス>"
+# 外部資料のローカルコピー（メモリ `book-local-location` から補う。リポジトリ外にある）
+TSDOCS="<TypeScript 公式ドキュメントのクローンの絶対パス>"      # 本文は $TSDOCS/packages/documentation/copy/en
+SURVIVAL="<サバイバルTypeScriptのクローンの絶対パス>"            # 本文は $SURVIVAL/docs
 
 PROMPT="$(cat AGENTS.md)
 
 対象: notes/chXX.md と、そのノート冒頭に記載された対応コード（code/ 配下）
 書籍の場所: $BOOK
 （章ごとの抽出テキストは $BOOK/text/chNN.txt。読めなければ『読めない』と報告し、推測で補わないこと）
+外部資料の場所（ローカル。Web は使わず、これらのファイルだけを読むこと）:
+- TypeScript 公式ドキュメント: $TSDOCS/packages/documentation/copy/en
+- サバイバルTypeScript: $SURVIVAL/docs
 指示: 上記の規約に従って対象をレビューし、結果を標準出力のみに出力すること。ファイルの作成・変更は一切行わないこと（保存は呼び出し側が行う）。"
 
 # Codex CLI
@@ -76,6 +82,8 @@ export AGY_CLI_DISABLE_AUTO_UPDATE=true
 agy -p "$PROMPT" \
   --mode plan \
   --add-dir "$BOOK" \
+  --add-dir "$TSDOCS" \
+  --add-dir "$SURVIVAL" \
   --output-format json \
   --print-timeout 5m \
   < /dev/null > "$RAW/agy_raw.json" 2> "$RAW/agy.err" &
