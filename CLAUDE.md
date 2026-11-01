@@ -22,7 +22,14 @@
 ユーザーから `/multi-note-review notes/chXX.md` と指示された場合、以下の手順を実行する。
 
 ### Step 1: 文脈特定
-対象の学習ノート（`notes/chXX.md`）と、そのノート冒頭に記載された対応コードを特定する（`code/` は章ごとに分けない）。記載がなければ推測せず「対応不明」と報告する。
+レビューはコミット済みの内容に対して行う。次の順に確認する。
+
+1. **未コミットの確認**: `git status --porcelain -- notes code` の出力が空であること（未追跡ファイルも含む）。出力があれば、実行せずに中止し、コミットを促す。コミットは人間が判断し、Claude は頼まれたときだけ行う。
+2. **対象のノート**: `notes/chXX.md`。
+3. **対応コード**（`code/` は章ごとに分けない）:
+   - ノート冒頭に対応コードの記載があれば、それを優先する。
+   - 記載がなければ、`git diff --name-only main...HEAD -- code` に出たファイルとする。
+   - どちらでも特定できない場合、または別の章のコードが混ざっていそうな場合は、推測せず「対応不明」と報告して人間に確認する。
 
 ### Step 2: Claude一次レビューの先行保存
 他AIの出力を見る前に、Claude単体でのレビューを `reviews/raw/<run_id>/claude_raw.md` に保存する。
@@ -35,6 +42,13 @@
 RUN_ID=$(date +%Y%m%d-%H%M)
 mkdir -p reviews/raw reviews/summary
 mkdir "reviews/raw/$RUN_ID"
+```
+
+どの版をレビューしたかを再現できるよう、実行時点のコミットと、Step 1 で特定した対応コードの一覧を、同じディレクトリに保存する（`target_code.txt` は1行1ファイル。ノート冒頭の記載から特定した場合は、その一覧を書き出す）。
+
+```bash
+git rev-parse HEAD > "reviews/raw/$RUN_ID/head.txt"
+git diff --name-only main...HEAD -- code > "reviews/raw/$RUN_ID/target_code.txt"
 ```
 
 ### Step 3: 外部CLIの非対話・読み取り専用実行
@@ -62,7 +76,7 @@ SURVIVAL="<サバイバルTypeScriptのクローンの絶対パス>"            
 
 PROMPT="$(cat AGENTS.md)
 
-対象: notes/chXX.md と、そのノート冒頭に記載された対応コード（code/ 配下）
+対象: notes/chXX.md と、Step 1 で特定した対応コード（$RAW/target_code.txt に一覧がある。code/ 配下）
 書籍の場所: $BOOK
 （章ごとの抽出テキストは $BOOK/text/chNN.txt。読めなければ『読めない』と報告し、推測で補わないこと）
 外部資料の場所（ローカル。Web は使わず、これらのファイルだけを読むこと）:
