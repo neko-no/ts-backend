@@ -57,6 +57,7 @@ git diff --name-only main...HEAD -- code > "reviews/raw/$RUN_ID/target_code.txt"
 - 子エージェントには AGENTS.md の保存先規定（`reviews/raw/` への書き出し）が見えるが、保存は司令塔（Claude）がリダイレクトで行う。そのため、プロンプトで「標準出力のみに出力し、ファイルは作らない」と明示する。
 - Codex の出力はテキスト（Markdown）なので `.md`、agy の出力は JSON なので `.json` で保存する（`--json` は付けない）。
 - agy はヘッドレスで許可を確認できず、リポジトリ外のファイルの `read_file` を自動拒否し、コマンド実行（`curl` など）も拒否するため Web を取得できない。書籍と外部資料はリポジトリ外にあるため、`--add-dir` で作業領域に追加する（`--dangerously-skip-permissions` は使わない）。Codex は `--sandbox read-only` のままリポジトリ外を読めるが、Web 検索も使えてしまう。3者を同じ条件にするため、プロンプトで「Web は使わず、渡したローカルのファイルだけを読む」と指示する。
+- agy は、コマンドが拒否されると、そのターンで止まり、レビュー本文のない応答（`status` は `SUCCESS`、`denied_actions` あり）を返すことがある。`AGENTS.md` に git を使う記述があると、レビュアーが確認しようとして起こる（run_id `20261101-1448` で発生）。git による確認は司令塔の手順なので、プロンプトで「済ませている。コマンドは使わない」と伝える。
 
 ```bash
 RAW="reviews/raw/$RUN_ID"
@@ -82,7 +83,8 @@ PROMPT="$(cat AGENTS.md)
 外部資料の場所（ローカル。Web は使わず、これらのファイルだけを読むこと）:
 - TypeScript 公式ドキュメント: $TSDOCS/packages/documentation/copy/en
 - サバイバルTypeScript: $SURVIVAL/docs
-指示: 上記の規約に従って対象をレビューし、結果を標準出力のみに出力すること。ファイルの作成・変更は一切行わないこと（保存は呼び出し側が行う）。"
+指示: 上記の規約に従って対象をレビューし、結果を標準出力のみに出力すること。ファイルの作成・変更は一切行わないこと（保存は呼び出し側が行う）。
+注意: 未コミットの確認と、対応コードの特定は、呼び出し側が済ませている（未コミットの変更なし。対応コードは上記の一覧）。コマンドは実行できない環境があるため、git などのコマンドは使わず、ファイルの読み取りだけでレビューすること。"
 
 # Codex CLI
 codex --ask-for-approval never exec \
