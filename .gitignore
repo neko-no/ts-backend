@@ -1,2 +1,3 @@
 # 各AIの無加工生出力。CLI のログに書籍の本文（著作物）が含まれうるため、コミットしない
 reviews/raw/
+node_modules/

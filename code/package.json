@@ -1,0 +1,14 @@
+{
+  "name": "ts-backend-code",
+  "version": "1.0.0",
+  "packageManager": "pnpm@12.16.1",
+  "dependencies": {
+    "date-fns": "^4.4.0",
+    "remeda": "^2.58.0"
+  },
+  "devDependencies": {
+    "typescript": "^7.0.2"
+  },
+  "private": true,
+  "type": "module"
+}
