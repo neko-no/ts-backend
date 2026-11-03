@@ -6,11 +6,11 @@ const isSameOrBefore = (date: Date, dateToCompare: Date): boolean =>
 const isSameOrAfter = (date: Date, dateToCompare: Date): boolean =>
   isAfter(date, dateToCompare) || isEqual(date, dateToCompare);
 
-// データ（start / end）と振る舞い（contains / postpone / extend）を、クラスに一体化した版
+// 2.1.2: 状態を private に隠し（カプセル化）、メソッドで状態を書き換える版
 class Period {
   constructor(
-    public readonly start: Date,
-    public readonly end: Date,
+    private start: Date,
+    private end: Date,
   ) {}
 
   // 指定した日時が期間に含まれるか
@@ -21,20 +21,23 @@ class Period {
     );
   }
 
-  // 日数・時間だけ遅延させた新しい Period を返す（元の Period は変更しない）
-  postpone(delayDays: number, delayHours: number): Period {
-    return new Period(
-      addHours(addDays(this.start, delayDays), delayHours),
-      addHours(addDays(this.end, delayDays), delayHours),
-    );
+  // this の状態を書き換える（戻り値は void）
+  postpone(delayDays: number, delayHours: number): void {
+    this.start = addHours(addDays(this.start, delayDays), delayHours);
+    this.end = addHours(addDays(this.end, delayDays), delayHours);
   }
 
-  // 日数・時間だけ延長した新しい Period を返す（元の Period は変更しない）
-  extend(extensionDays: number, extensionHours: number): Period {
-    return new Period(
-      new Date(this.start),
-      addHours(addDays(this.end, extensionDays), extensionHours),
-    );
+  // this の状態を書き換える（戻り値は void）
+  extend(extensionDays: number, extensionHours: number): void {
+    this.end = addHours(addDays(this.end, extensionDays), extensionHours);
+  }
+
+  get startDate(): Date {
+    return this.start;
+  }
+
+  get endDate(): Date {
+    return this.end;
   }
 
   // 開始日時と日数から Period を生成する
