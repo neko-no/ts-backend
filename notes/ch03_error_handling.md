@@ -131,6 +131,17 @@ const ok = <T>(data: T): Ok<T> => ...    // () の直前
 - `<...>` に入れられるのは型。値の `kind` はそのまま書けず、型の位置の `typeof kind` で型を取り出す
 - 値と型で同じ文字列を二重に書かずに済み、値を変えると型も追従する
 
+`as const`（コンパニオンオブジェクトの `{ kind, create } as const`）
+
+- オブジェクトに付けると、各プロパティが `readonly` になり、リテラル型が `string` に広がらない
+  - `{ kind, create }` のままだと、`kind` は `string` に広がる（`const kind = 'X'` をプロパティに入れると、書き換えられる場所と見なされるため）
+  - `readonly kind`、`readonly create` と1つずつ書かなくて済む
+- 後で `case NumberOfMembersError.kind:` のように使ったときに、型の絞り込みを効かせるために必要
+- `interface` の `readonly` との違い
+  - `interface` の `readonly`: 型情報。「そのプロパティは読み取り専用であるべき」という指定
+  - オブジェクトの `as const`: その値のプロパティを、`readonly` かつリテラル型にする
+- `readonly` はコンパイル時の指定。実行時に書き換えを防ぐものではない
+
 `export`
 
 - `export const X` だけだと、同名の `interface X` は export されず、型としては使えない
