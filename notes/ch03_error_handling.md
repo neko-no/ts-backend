@@ -1,7 +1,11 @@
 エラーハンドリング
 
-読了範囲: （読み進めたら記入）
-対応コード: （`code/` の対応ファイルが決まったら記入）
+読了範囲: 3.1 〜 3.4.3（3.4.4 以降は未読）
+対応コード:
+- `code/rational.ts`、`code/rational-demo.ts`（3.3 の関数版 Rational）
+- `code/result.ts`（3.4.1 Result の型と Ok / Err）
+- `code/application-error.ts`、`code/number-of-members-error.ts`、`code/indivisible-bill-error.ts`（3.4.2 エラー値）
+- `code/split-bill.ts`（3.4.3 利用例）
 
 
 
@@ -38,11 +42,11 @@ Resultを適応すべき範囲
 - 呼び出し元で分岐をさせるかで決める
 - 色々なところで処理するよりも、境界で一律に変換するのが効率的
 
-　
-
-- ## node.jsのassertを使って機能を実装している
 
 
+node.jsのassertを使って機能を実装している
+
+  
 
 契約
 
@@ -56,6 +60,7 @@ Resultを適応すべき範囲
 ## `Result<T, E>`
 
 - `Ok` / `Err` の型定義とファクトリー関数
+- Result型にすることで、型の絞り込みを行うことを親側で強制できる。　何を返却されるのかを型システムによって、確認できる。
 
 
 
@@ -80,17 +85,9 @@ const ok = <T>(data: T): Ok<T> => ...    // () の直前
 | Fault  | 実行時に発生する異常な状態    | 不能  |
 
 
-回復可能／不能の判断基準:
+回復可能／不能の判断基準:　仕様や業務ルール上起こり得る事象かどうか
 
 
-
-&nbsp;
-
-## エラー値の網羅性チェック（`switch` と `assertNever`）
-
-
-
-&nbsp;
 
 ## TypeScript の基礎メモ（Result の定義を読むために確認したこと）
 
@@ -147,7 +144,7 @@ const ok = <T>(data: T): Ok<T> => ...    // () の直前
 - `export const X` だけだと、同名の `interface X` は export されず、型としては使えない
 - 末尾の `export { X }` は、同じ名前の型と値を両方 export する
 
-&nbsp;
+
 
 ## 疑問・あとで戻ること
 
