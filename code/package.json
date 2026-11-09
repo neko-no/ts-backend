@@ -4,6 +4,7 @@
   "packageManager": "pnpm@12.16.1",
   "dependencies": {
     "date-fns": "^4.4.0",
+    "neverthrow": "^8.2.0",
     "remeda": "^2.58.0"
   },
   "devDependencies": {
