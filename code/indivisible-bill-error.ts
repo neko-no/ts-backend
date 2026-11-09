@@ -27,3 +27,6 @@ const IndivisibleBillError = {
   kind,
   create
 } as const;
+
+
+export {IndivisibleBillError};
