@@ -25,11 +25,11 @@
   - 29 行目の「第二引数が、エラー時に処理をする関数」は不正確。書籍 4.1.2（p.86〜87）では、捕捉した例外（`unknown`）をエラー値（`E`）に変換する関数で、省略可能。
   - `fromThrowable` は、関数をラップして、`Result` を返す新しい関数を作る（その場で実行して `Result` を返すわけではない）。型定義でも確認した。
   - 非同期は、Promise を返す関数 / 生成済みの Promise / 拒否しないと判断できる Promise で、`ResultAsync.fromThrowable` / `fromPromise` / `fromSafePromise` を使い分ける（4.1.2〜4.1.3、p.87〜90）。特に `fromPromise` は、引数の評価中に起きた同期例外を捕捉しない（p.89）。`fromSafePromise` は、拒否を `Err` にせず、第3章の Defect / Fault として伝播させる（p.89〜90）。ノートにはこの接続が無い。
-- 手がかり: 書籍 4.1.2 の 3 つの役割（ラップされる関数、エラー値への変換関数、生成される関数）と、4.1.2 の `unsafeWrapPromise` の例。
+- 手がかり: 書籍 4.1.2 の 3 つの役割（ラップされる関数、エラー値への変換関数、生成される関数）と、`fromPromise` の節の、同期例外が捕捉されない例。
 
 ### 1-3. `andTee` / `andThrough` の「失敗」の意味が、例外と `Err` で区別されていない（B・C）— 証拠 90
 - どこ: ノート 54 行目
-- なぜ: 「失敗を結果に反映したいときは `andThrough` を使う」だけだと、例外や Promise の拒否も `Err` に変換されると読める。書籍 4.2.5（p.101）は、(1) 差し込んだ処理が返す `Err` を結果に反映する場合と、(2) Defect / Fault として扱う例外や Promise の拒否を後続へ伝播させる場合に、`andThrough` を使うと書いている。同期の `andThrough` に例外を投げる関数を渡すと、`Err` に変換されず、そのまま例外が伝播することを実行して確認した。`andTee` は握りつぶされ、元の `Ok` が返る。
+- なぜ: 「失敗を結果に反映したいときは `andThrough` を使う」だけだと、例外や Promise の拒否も `Err` に変換されると読める。書籍 4.2.5（p.101）は、`andThrough` を使う場面として、差し込んだ処理が返す `Err` を結果に反映したいときと、第3章の Defect / Fault にあたる例外や拒否を握りつぶさず先へ伝えたいときの2つを挙げている。同期の `andThrough` に例外を投げる関数を渡すと、`Err` に変換されず、そのまま例外が伝播することを実行して確認した。`andTee` は握りつぶされ、元の `Ok` が返る。
 - 手がかり: 「関数が返す `Err`」と「関数が投げる例外」を分けて、`andThrough` と `andTee` のそれぞれで何が起きるかを表にする。`ResultAsync.andTee` の挙動は、書籍の記述のみで、コードでは未確認。
 
 ### 1-4. アンラップ（4.3）の記述が薄く、`unwrapOr` の評価タイミングが無い（A・B・C）— 証拠 85
@@ -102,6 +102,6 @@
 
 読了範囲（4.1〜4.4）に限る。
 
-1. `ResultAsync.fromPromise(unsafeWrapPromise(), …)` で、`unsafeWrapPromise()` が同期的に例外を投げたとき、なぜ `Err` に変換されないのか。`ResultAsync.fromThrowable` でラップした関数を呼ぶ場合と、どこが違うか。（出典: 書籍 4.1.2、p.89）
+1. Promise を返す関数が、Promise を返す前に同期的に例外を投げる実装だったとする。その関数の呼び出し結果を `ResultAsync.fromPromise` に渡した場合、例外はなぜ `Err` に変換されないのか。関数そのものを `ResultAsync.fromThrowable` でラップして呼ぶ場合と、どこが違うか。（出典: 書籍 4.1.2、p.89）
 2. `userResult.unwrapOr(createGuestUser())` は、`userResult` が `Ok` のときにも `createGuestUser()` を実行する。なぜか。実行させたくないとき、(1) 値としてアンラップしたい場合と、(2) `Result` のまま続けたい場合で、それぞれどのメソッドを使うか。（出典: 書籍 4.3.2、p.107）
 3. 3 つの `ResultAsync` を `ResultAsync.combine` で統合したとき、先頭が `Err` になっても、残りの非同期処理は止まるか。「短絡評価」が指すのは、何を止めることか。同期の `Result.combine` と、どこが同じで、どこが違うか。（出典: 書籍 4.4.1、p.109〜110）
