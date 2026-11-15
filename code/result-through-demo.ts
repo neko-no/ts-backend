@@ -38,28 +38,23 @@ const rOkEmpty: Result<User, ParseError> = ok({ id: 'user-2', name: '' });
 const r3 = rOkEmpty.andThrough(validateName);
 
 
-// ---- andTee: 成功値は変えずに、ログ出力などの副作用を差し込む ----
+// ---- andTee: 成功値はそのままに、副作用（記録など）を横に流す ----
 
-// logInfo が何回呼ばれたかを数える（Err のとき呼ばれないことの確認用）
-let logCalls = 0;
-const logInfo = (message: string): void => {
-  logCalls += 1;
-  console.log(message);
+// 差し込んだ関数が呼ばれた回数と中身を、配列に残して確認する
+const calledWith: string[] = [];
+const record = (user: User): void => {
+  calledWith.push(user.id);
 };
 
-// Ok のとき: 関数が実行され（ログが出力される）、結果は元の User のまま
-const t1 = rOk.andTee((user) => {
-  logInfo(`user=${user.id}`);
-});
+// Ok のとき: 差し込んだ関数が呼ばれ、結果は元の Ok のまま
+const t1 = rOk.andTee(record);
 assert.deepStrictEqual(t1, rOk);
-assert.strictEqual(logCalls, 1);
+assert.deepStrictEqual(calledWith, ['user-1']);
 
-// Err のとき: 関数は実行されず、元の ParseError を引き継ぐ
-const t2 = rErr.andTee((user) => {
-  logInfo(`user=${user.id}`);
-});
+// Err のとき: 差し込んだ関数は呼ばれず、結果も元の Err のまま
+const t2 = rErr.andTee(record);
 assert.deepStrictEqual(t2, rErr);
-assert.strictEqual(logCalls, 1);
+assert.deepStrictEqual(calledWith, ['user-1']);
 
 // 関数が例外を投げても、結果には反映されず、元の Ok のまま（andThrough との違い）
 const t3 = rOk.andTee(() => {

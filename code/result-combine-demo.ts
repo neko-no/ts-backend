@@ -15,32 +15,32 @@ const r2 = Result.combine(results2);
 
 // ---- タプル: 要素ごとに型が違う Result をまとめる ----
 
-// すべて Ok: 成功値がタプルにまとまる（Result<[number, string], never>）
-const tupleOk: [Result<number, never>, Result<string, never>] = [
-  ok(1),
-  ok('Two'),
+// すべて Ok: 成功値がタプルにまとまる（Result<[number, boolean], never>）
+const tupleOk: [Result<number, never>, Result<boolean, never>] = [
+  ok(10),
+  ok(true),
 ];
 const t1 = Result.combine(tupleOk);
 assert.ok(t1.isOk());
-assert.deepStrictEqual(t1.value, [1, 'Two']);
+assert.deepStrictEqual(t1.value, [10, true]);
 
 // Err を含む: 入力順で最初の Err が結果になる。
-// エラー型は、各要素のエラー型のユニオン（Result<[number, string], SomethingError | boolean>）
-const tupleErr: [Result<number, SomethingError>, Result<string, boolean>] = [
-  err(SomethingError.create('err!')),
-  err(true),
+// エラー型は、各要素のエラー型のユニオン（Result<[number, boolean], SomethingError | string>）
+const tupleErr: [Result<number, SomethingError>, Result<boolean, string>] = [
+  err(SomethingError.create('first')),
+  err('second'),
 ];
 const t2 = Result.combine(tupleErr);
 assert.ok(t2.isErr());
-assert.deepStrictEqual(t2.error, SomethingError.create('err!'));
+assert.deepStrictEqual(t2.error, SomethingError.create('first'));
 
 // 先頭が Ok でも、後ろに Err があればその Err が結果になる（型は t2 と同じ）
-const tupleErrSecond: [Result<number, SomethingError>, Result<string, boolean>] = [
-  ok(1),
-  err(true),
+const tupleErrSecond: [Result<number, SomethingError>, Result<boolean, string>] = [
+  ok(10),
+  err('second'),
 ];
 const t3 = Result.combine(tupleErrSecond);
 assert.ok(t3.isErr());
-assert.strictEqual(t3.error, true);
+assert.strictEqual(t3.error, 'second');
 
 console.log('t1:', JSON.stringify(t1), '/ t2:', JSON.stringify(t2), '/ t3:', JSON.stringify(t3));
