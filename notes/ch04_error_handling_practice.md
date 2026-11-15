@@ -69,6 +69,67 @@
   - `f1`（2倍）と `f2`（文字列化）は、実際には失敗しない。型を `andThen` に渡せる形にしてあるだけ
   - `f3` は、文字列が `'NaN'` なら `err`。文字列化の失敗ではなく、元の数値が `NaN` だったことの検査
   - 要点は、連結するたびに成功値の型が変わり（`number` → `string`）、エラー型が増えていくこと（`SomethingError | undefined`）
+- 関数に渡されるのは `Result` 自体ではなく、中身（成功値かエラー値）。`map` / `andThen` / `andThrough` / `andTee` は成功値、`mapErr` / `orElse` / `orTee` はエラー値を受け取る。関数は `Result` を知らなくてよい
+
+### メソッド名の整理（自分の整理。書籍が明記しているわけではない）
+
+- `and` が付くものは `Ok` のとき、`or` が付くものは `Err` のときに関数を適用する
+  - 書籍が「対になる」と書いているのは、`andThen` と `orElse`（4.2.4）、`andTee` と `orTee`（4.2.6）
+  - `andThrough` に対応するエラー側のメソッドは、4.2 の範囲には無い
+
+| | `Ok` のとき（`and`） | `Err` のとき（`or`） |
+| --- | --- | --- |
+| 関数が普通の値を返す | `map` | `mapErr` |
+| 関数が `Result` を返す | `andThen` | `orElse` |
+| 差し込み（副作用） | `andTee` | `orTee` |
+
+- 成功のとき（`and`）の3つは、2つの問いで選ぶ
+  1. 関数の結果で、成功値は変わるか？ 変わる → `andThen`
+  2. 変わらないなら、関数の失敗を結果に反映するか？ 反映する → `andThrough`、しない → `andTee`
+- 勘違いしたこと
+  - `andThrough` は、関数が `Err` を返しても無視するものだと思っていた → 無視するのは `andTee`。`andThrough` は、関数が返した `Err` が結果になる。完全にスルーするのは、元が `Err` のとき（関数が呼ばれない）だけ
+  - `andThen` や `andThrough` が適用されるのは `Ok` のときだけ
+
+### 図で思い出す（自分で作った図。書籍の図 4.1〜4.6 とは別）
+
+どの図も、上が `Ok` のとき、下が `Err` のときの流れ。オレンジの枠が、渡した関数 `f`。破線は「`f` を呼ばずにそのまま通る」。
+
+`map`: 成功値を変換する（関数は普通の値を返す）
+
+![map：成功値を変換する](img/result-map.png)
+
+`andThen`: 成功値に、`Result` を返す関数を連結する
+
+![andThen：Result を返す関数を連結する](img/result-andthen.png)
+
+`andThrough`: 成功値は変えずに、検証の失敗だけ結果に反映する
+
+![andThrough：成功値は変えず、検証の失敗だけ反映する](img/result-andthrough.png)
+
+`andTee`: 成功値は変えずに、枝で副作用を流す。T字に分かれて、本流は変わらない
+
+![andTee：本流は変えず、枝で副作用を流す](img/result-andtee.png)
+
+`mapErr`: エラー値を変換する（関数は普通の値を返す）
+
+![mapErr：エラー値を変換する](img/result-maperr.png)
+
+`orElse`: エラー値に、`Result` を返す関数を連結する（代わりの `Result` に切り替える）
+
+![orElse：エラーのとき、代わりの Result に切り替える](img/result-orelse.png)
+
+`orTee`: エラー値は変えずに、枝で副作用を流す
+
+![orTee：エラー値は変えず、枝で副作用を流す](img/result-ortee.png)
+
+### コードで確認したこと
+
+- `code/result-map-demo.ts`: `map` が `Ok` のときだけ関数を適用し、`Err` では呼ばれない。元の `Result` は変わらない
+- `code/result-through-demo.ts`: `andThrough` と `andTee`
+  - `Ok` で検証が成功 → 元の成功値のまま
+  - `Err` → 検証関数は呼ばれない（`andTee` のログも出ない）
+  - `Ok` で名前が空 → `andThrough` はその `Err` が結果になる。`andTee` は元の `Ok` のまま
+  - `andTee` の関数が例外を投げても `Err` を返しても、結果は元のまま
 
 ## 4.3 `Result` のアンラップ
 
@@ -94,4 +155,9 @@
 
 ## 疑問・あとで戻ること
 
+- `declare` とは何か（TypeScript の補足。書籍のコード片に出てくる）
+  - 「この名前の変数や関数があり、型はこうだ」とコンパイラに伝えるだけの宣言。実体（値や処理）は作らない
+  - 型チェックでは使えるが、実行すると変数は存在しないので `ReferenceError` になる
+  - 書籍のコード片で多用されるのは、実装を書かずに型の動きだけを見せたいから。動かしたいときは `ok(...)` や関数の実装に置き換える
+- `ResultAsync` の `andTee` の挙動（例外・Promise の拒否が握りつぶされる）は、非同期のコードでまだ試していない
 - 
