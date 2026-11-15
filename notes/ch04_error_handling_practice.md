@@ -1,9 +1,12 @@
 戻り値によるエラーハンドリングの実践
 
-読了範囲: （未着手。読み進めながら更新する）
+読了範囲: 4.1 〜 4.2、4.4.1（4.3 と 4.4.2 は未読）
 対応コード:
-
-- （実装したら追記する）
+- `code/result-map-demo.ts`（4.2.1 `map`）
+- `code/result-through-demo.ts`（4.2.5 `andThrough` / `andTee`）
+- `code/result-combine-demo.ts`（4.4.1 `Result.combine`。配列とタプル）
+- `code/something-error.ts`（書籍のコード片に出てくる `SomethingError`。上のコードから使う）
+- 4.1、4.2.2〜4.2.4、4.2.6 は、ノートと図のみで、確認コードは無い
 
 ## この章で理解すること
 
