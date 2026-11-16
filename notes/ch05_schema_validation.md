@@ -1,3 +1,13 @@
+スキーマを用いたバリデーション処理
+
+読了範囲: 5.1 〜 5.4（第5章すべて）
+対応コード:
+- `code/zod-basic.test.ts`（5.3.1 `parse` / `safeParse` / `error.issues`）
+- `code/zod-value.test.ts`（5.3.2 数値の `min` / `max` / `z.int()`、複数エラーの収集）
+- `code/zod-super-refine.test.ts`（5.3.3 `superRefine`）
+- `code/zod-infer.test.ts`（5.4 `z.input` / `z.output` / `z.infer`、`transform` / `default` / `brand`）
+- 確認コードが無い範囲: 5.1、5.2、5.3.3 の `refine`、5.3.4（通知メッセージの設定）
+
 Zodによるバリデーション
 
 - 定義したスキーマから型を推論できる
